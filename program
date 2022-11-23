@@ -1,0 +1,73 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const args = process.argv;
+console.log(args);
+const commands = ['read', 'write', 'copy', 'reverse'];
+
+const getHelpText = function () {
+    const helpText = `
+    simplecli is a simple cli program to demonstrate how to handle files using streams.
+    usage:
+        mycliprogram <command> <path_to_file>
+
+        <command> can be:
+        read: Print a file's contents to the terminal
+        write: Write a message from the terminal to a file
+        copy: Create a copy of a file in the current directory
+        reverse: Reverse the content of a file and save its output to another file.
+
+        <path_to_file> is the path to the file you want to work with.
+    `;
+    console.log(helpText);
+}
+
+let command = '';
+
+if (args.length < 3) {
+    getHelpText();
+    return;
+}
+else if (args.length > 4) {
+    console.log('More arguments provided than expected');
+    getHelpText();
+    return;
+}
+else {
+    command = args[2]
+    if (!args[3]) {
+        console.log('This tool requires at least one path to a file');
+        getHelpText();
+        return;
+    }
+}
+
+switch (commands.indexOf(command)) {
+    case 0:
+        read(args[3]);
+        break;
+    case 1:
+        console.log('command is write');
+        break;
+    case 2:
+        console.log('command is copy');
+        break;
+    case 3:
+        console.log('command is reverse');
+        break;
+    default:
+        console.log('You entered a wrong command. See help text below for supported functions');
+        getHelpText();
+        return;
+}
+
+function read(filePath) {
+    const readableStream = fs.createReadStream(filePath, 'utf8');
+
+    readableStream.on('error', function (error) {
+        console.log(`error: ${error.message}`);
+    })
+    readableStream.on('data', (chunk) => {
+        console.log(chunk);
+    })
+}
